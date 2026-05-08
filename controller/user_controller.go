@@ -35,3 +35,34 @@ func (c *UserController) Register(ctx fiber.Ctx) error {
 
 	return util.Success(ctx, "Register success", response)
 }
+
+func (c *UserController) Login(ctx fiber.Ctx) error {
+	var loginRequest struct {
+		Email    string `json:"email" validate:"required"`
+		Password string `json:"password" validate:"required"`
+	}
+
+	if err := ctx.Bind().Body(&loginRequest); err != nil {
+		return util.BadRequest(ctx, "Invalid Request", nil, err.Error())
+	}
+
+	user, err := c.userService.Login(loginRequest.Email, loginRequest.Password)
+	if err != nil {
+		return util.Unauthorized(ctx, "Invalid Credential", nil, err.Error())
+	}
+
+	token, _ := util.GenerateToken(user.InternalID, user.Role, user.Email, user.PublicID)
+	refreshToken, _ := util.GenerateRefreshToken(user.InternalID)
+
+	var data model.UserResponse
+	err = copier.Copy(&data, user)
+	if err != nil {
+		return util.InternalServerError(ctx, "Failed construct response", nil, err.Error())
+	}
+
+	return util.Success(ctx, "Login Success", fiber.Map{
+		"access_token":  token,
+		"refresh_token": refreshToken,
+		"user":          data,
+	})
+}

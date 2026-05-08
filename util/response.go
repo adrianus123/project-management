@@ -45,3 +45,7 @@ func NotFound(c fiber.Ctx, message string, data interface{}, err string) error {
 func InternalServerError(c fiber.Ctx, message string, data interface{}, err string) error {
 	return c.Status(fiber.StatusInternalServerError).JSON(BuildResponse("Internal Server Error", fiber.StatusInternalServerError, message, data, err))
 }
+
+func Unauthorized(c fiber.Ctx, message string, data interface{}, err string) error {
+	return c.Status(fiber.StatusUnauthorized).JSON(BuildResponse("Unauthorized", fiber.StatusUnauthorized, message, data, err))
+}
