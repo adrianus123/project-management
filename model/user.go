@@ -18,3 +18,12 @@ type User struct {
 	UpdatedAt  time.Time      `json:"updated_at" db:"updated_at" gorm:"column:updated_at;not null"`
 	DeletedAt  gorm.DeletedAt `json:"-" gorm:"column:deleted_at;index"`
 }
+
+type UserResponse struct {
+	PublicID  uuid.UUID `json:"public_id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
