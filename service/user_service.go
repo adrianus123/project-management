@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 
+	"github.com/adrianus123/project-management/constant"
 	"github.com/adrianus123/project-management/model"
 	"github.com/adrianus123/project-management/repository"
 	"github.com/adrianus123/project-management/util"
@@ -28,7 +29,7 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 func (s *userServiceImpl) Register(user *model.User) error {
 	userExist, _ := s.userRepository.FindByEmail(user.Email)
 	if userExist.InternalID != 0 {
-		return errors.New("Email already registered")
+		return errors.New(constant.ERR_EMAIL_ALREADY_EXISTS)
 	}
 
 	hashed, err := util.HashPassword(user.Password)
@@ -46,11 +47,11 @@ func (s *userServiceImpl) Register(user *model.User) error {
 func (s *userServiceImpl) Login(email, password string) (*model.User, error) {
 	user, err := s.userRepository.FindByEmail(email)
 	if err != nil {
-		return nil, errors.New("Invalid Credential")
+		return nil, errors.New(constant.ERR_INVALID_CREDENTIAL)
 	}
 
 	if !util.VerifyPassword(password, user.Password) {
-		return nil, errors.New("Invalid Credential")
+		return nil, errors.New(constant.ERR_INVALID_CREDENTIAL)
 	}
 
 	return user, nil

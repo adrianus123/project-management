@@ -4,6 +4,7 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/adrianus123/project-management/constant"
 	"github.com/adrianus123/project-management/model"
 	"github.com/adrianus123/project-management/service"
 	"github.com/adrianus123/project-management/util"
@@ -23,20 +24,20 @@ func (c *UserController) Register(ctx fiber.Ctx) error {
 	user := new(model.User)
 
 	if err := ctx.Bind().Body(user); err != nil {
-		return util.BadRequest(ctx, "Failed parsing data", nil, err.Error())
+		return util.BadRequest(ctx, constant.ERR_FAILED_PARSE_DATA, nil, err.Error())
 	}
 
 	if err := c.userService.Register(user); err != nil {
-		return util.BadRequest(ctx, "Register failed", nil, err.Error())
+		return util.BadRequest(ctx, constant.ERR_FAILED_REGISTER, nil, err.Error())
 	}
 
 	var response model.UserResponse
 	err := copier.Copy(&response, &user)
 	if err != nil {
-		return util.InternalServerError(ctx, "Failed construct response", nil, err.Error())
+		return util.InternalServerError(ctx, constant.ERR_CONSTRUCT_RESPONSE, nil, err.Error())
 	}
 
-	return util.Success(ctx, "Register success", response)
+	return util.Success(ctx, constant.SUCCESS_REGISTER, response)
 }
 
 func (c *UserController) Login(ctx fiber.Ctx) error {
@@ -46,12 +47,12 @@ func (c *UserController) Login(ctx fiber.Ctx) error {
 	}
 
 	if err := ctx.Bind().Body(&loginRequest); err != nil {
-		return util.BadRequest(ctx, "Invalid Request", nil, err.Error())
+		return util.BadRequest(ctx, constant.ERR_INVALID_REQUEST, nil, err.Error())
 	}
 
 	user, err := c.userService.Login(loginRequest.Email, loginRequest.Password)
 	if err != nil {
-		return util.Unauthorized(ctx, "Invalid Credential", nil, err.Error())
+		return util.Unauthorized(ctx, constant.ERR_INVALID_CREDENTIAL, nil, err.Error())
 	}
 
 	token, _ := util.GenerateToken(user.InternalID, user.Role, user.Email, user.PublicID)
@@ -60,10 +61,10 @@ func (c *UserController) Login(ctx fiber.Ctx) error {
 	var data model.UserResponse
 	err = copier.Copy(&data, &user)
 	if err != nil {
-		return util.InternalServerError(ctx, "Failed construct response", nil, err.Error())
+		return util.InternalServerError(ctx, constant.ERR_CONSTRUCT_RESPONSE, nil, err.Error())
 	}
 
-	return util.Success(ctx, "Login Success", fiber.Map{
+	return util.Success(ctx, constant.SUCCESS_LOGIN, fiber.Map{
 		"access_token":  token,
 		"refresh_token": refreshToken,
 		"user":          data,
@@ -74,16 +75,16 @@ func (c *UserController) GetUser(ctx fiber.Ctx) error {
 	id := ctx.Params("id")
 	user, err := c.userService.GetUserByPublicID(id)
 	if err != nil {
-		return util.NotFound(ctx, "User Not Found", nil, err.Error())
+		return util.NotFound(ctx, constant.ERR_DATA_NOT_FOUND, nil, err.Error())
 	}
 
 	var response model.UserResponse
 	err = copier.Copy(&response, &user)
 	if err != nil {
-		return util.InternalServerError(ctx, "Failed construct response", nil, err.Error())
+		return util.InternalServerError(ctx, constant.ERR_CONSTRUCT_RESPONSE, nil, err.Error())
 	}
 
-	return util.Success(ctx, "Get User Success", response)
+	return util.Success(ctx, constant.SUCCESS_GET_DATA, response)
 }
 
 func (c *UserController) GetUserPagination(ctx fiber.Ctx) error {
@@ -97,12 +98,12 @@ func (c *UserController) GetUserPagination(ctx fiber.Ctx) error {
 
 	users, total, err := c.userService.GetAllPagination(filter, sort, limit, offset)
 	if err != nil {
-		return util.InternalServerError(ctx, "Failed get users", nil, err.Error())
+		return util.InternalServerError(ctx, constant.ERR_INTERNAL_SERVER_ERROR, nil, err.Error())
 	}
 
 	var response []model.UserResponse
 	if err := copier.Copy(&response, &users); err != nil {
-		return util.InternalServerError(ctx, "Failed construct response", nil, err.Error())
+		return util.InternalServerError(ctx, constant.ERR_CONSTRUCT_RESPONSE, nil, err.Error())
 	}
 
 	meta := util.PaginationMeta{
@@ -115,8 +116,8 @@ func (c *UserController) GetUserPagination(ctx fiber.Ctx) error {
 	}
 
 	if total == 0 {
-		return util.NotFoundPagination(ctx, "", nil, meta, "No user found")
+		return util.NotFoundPagination(ctx, "", nil, meta, constant.ERR_DATA_NOT_FOUND)
 	}
 
-	return util.SuccessPagination(ctx, "Get All Users Success", response, meta)
+	return util.SuccessPagination(ctx, constant.SUCCESS_GET_DATA, response, meta)
 }
