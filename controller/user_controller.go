@@ -9,6 +9,7 @@ import (
 	"github.com/adrianus123/project-management/service"
 	"github.com/adrianus123/project-management/util"
 	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 )
 
@@ -120,4 +121,36 @@ func (c *UserController) GetUserPagination(ctx fiber.Ctx) error {
 	}
 
 	return util.SuccessPagination(ctx, constant.SUCCESS_GET_DATA, response, meta)
+}
+
+func (c *UserController) UpdateUser(ctx fiber.Ctx) error {
+	id := ctx.Params("id")
+	publicID, err := uuid.Parse(id)
+	if err != nil {
+		return util.BadRequest(ctx, "", nil, constant.ERR_BAD_REQUEST)
+	}
+
+	var user model.User
+	if err := ctx.Bind().Body(&user); err != nil {
+		return util.BadRequest(ctx, "", nil, constant.ERR_FAILED_PARSE_DATA)
+	}
+
+	user.PublicID = publicID
+
+	if err := c.userService.Update(&user); err != nil {
+		return util.InternalServerError(ctx, "", nil, constant.ERR_FAILED_UPDATE_DATA)
+	}
+
+	userUpdated, err := c.userService.GetUserByPublicID(id)
+	if err != nil {
+		return util.InternalServerError(ctx, "", nil, constant.ERR_DATA_NOT_FOUND)
+	}
+
+	var response model.UserResponse
+	err = copier.Copy(&response, &userUpdated)
+	if err != nil {
+		return util.InternalServerError(ctx, "", nil, constant.ERR_FAILED_PARSE_DATA)
+	}
+
+	return util.Success(ctx, constant.SUCCESS_UPDATE_DATA, response)
 }
