@@ -14,6 +14,7 @@ type UserRepository interface {
 	FindByPublicID(publicID string) (*model.User, error)
 	FindAllPagination(filter, sort string, limit, offset int) ([]model.User, int64, error)
 	Update(user *model.User) error
+	Delete(id uint) error
 }
 
 type userRepositoryImpl struct {
@@ -90,4 +91,8 @@ func (r *userRepositoryImpl) Update(user *model.User) error {
 		map[string]interface{}{
 			"name": user.Name,
 		}).Error
+}
+
+func (r *userRepositoryImpl) Delete(id uint) error {
+	return config.DB.Delete(&model.User{}, id).Error
 }

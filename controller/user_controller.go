@@ -154,3 +154,12 @@ func (c *UserController) UpdateUser(ctx fiber.Ctx) error {
 
 	return util.Success(ctx, constant.SUCCESS_UPDATE_DATA, response)
 }
+
+func (c *UserController) DeleteUser(ctx fiber.Ctx) error {
+	id := ctx.Params("id")
+	if err := c.userService.Delete(id); err != nil {
+		return util.InternalServerError(ctx, "", nil, constant.ERR_FAILED_DELETE_DATA)
+	}
+
+	return util.Success(ctx, constant.SUCCESS_DELETE_DATA, nil)
+}

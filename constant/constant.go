@@ -13,9 +13,11 @@ const (
 	ERR_BAD_REQUEST           = "Bad request"
 	ERR_EMAIL_ALREADY_EXISTS  = "Email already exists"
 	ERR_FAILED_UPDATE_DATA    = "Failed update data"
+	ERR_FAILED_DELETE_DATA    = "Failed delete data"
 
 	SUCCESS_REGISTER    = "Register success"
 	SUCCESS_LOGIN       = "Login success"
 	SUCCESS_GET_DATA    = "Get data success"
 	SUCCESS_UPDATE_DATA = "Update data success"
+	SUCCESS_DELETE_DATA = "Delete data success"
 )
