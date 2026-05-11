@@ -12,6 +12,9 @@ import (
 type UserService interface {
 	Register(user *model.User) error
 	Login(email, password string) (*model.User, error)
+	GetUserByID(id uint) (*model.User, error)
+	GetUserByPublicID(publicID string) (*model.User, error)
+	GetAllPagination(filter, sort string, limit, offset int) ([]model.User, int64, error)
 }
 
 type userServiceImpl struct {
@@ -51,4 +54,16 @@ func (s *userServiceImpl) Login(email, password string) (*model.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *userServiceImpl) GetUserByID(id uint) (*model.User, error) {
+	return s.userRepository.FindByID(id)
+}
+
+func (s *userServiceImpl) GetUserByPublicID(publicID string) (*model.User, error) {
+	return s.userRepository.FindByPublicID(publicID)
+}
+
+func (s *userServiceImpl) GetAllPagination(filter, sort string, limit, offset int) ([]model.User, int64, error) {
+	return s.userRepository.FindAllPagination(filter, sort, limit, offset)
 }
