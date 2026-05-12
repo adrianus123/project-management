@@ -24,9 +24,12 @@ func main() {
 	userService := service.NewUserService(userRepository)
 	userController := controller.NewUserController(userService)
 
+	// Board Member
+	boardMemberRepository := repository.NewBoardMemberRepository()
+
 	// Board
 	boardRepository := repository.NewBoardRepository()
-	boardService := service.NewBoardService(boardRepository, userRepository)
+	boardService := service.NewBoardService(boardRepository, userRepository, boardMemberRepository)
 	boardController := controller.NewBoardController(boardService)
 
 	routes.Setup(app, userController, boardController)

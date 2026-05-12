@@ -14,6 +14,7 @@ const (
 	ERR_EMAIL_ALREADY_EXISTS  = "Email already exists"
 	ERR_FAILED_UPDATE_DATA    = "Failed update data"
 	ERR_FAILED_DELETE_DATA    = "Failed delete data"
+	ERR_FAILED_ADD_MEMBERS    = "Failed add members"
 
 	SUCCESS_REGISTER    = "Register success"
 	SUCCESS_LOGIN       = "Login success"
@@ -21,4 +22,5 @@ const (
 	SUCCESS_UPDATE_DATA = "Update data success"
 	SUCCESS_DELETE_DATA = "Delete data success"
 	SUCESS_CREATE       = "Success create data"
+	SUCCESS_ADD_MEMBERS = "Success add members"
 )
