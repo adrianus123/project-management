@@ -42,7 +42,7 @@ func (c *BoardController) CreateBoard(ctx fiber.Ctx) error {
 		return util.BadRequest(ctx, "", nil, err.Error())
 	}
 
-	return util.Success(ctx, constant.SUCESS_CREATE, board)
+	return util.Success(ctx, constant.SUCCESS_CREATE_DATA, board)
 }
 
 func (c *BoardController) UpdateBoard(ctx fiber.Ctx) error {

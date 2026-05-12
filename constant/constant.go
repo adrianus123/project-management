@@ -22,7 +22,7 @@ const (
 	SUCCESS_GET_DATA       = "Get data success"
 	SUCCESS_UPDATE_DATA    = "Update data success"
 	SUCCESS_DELETE_DATA    = "Delete data success"
-	SUCESS_CREATE          = "Success create data"
+	SUCCESS_CREATE_DATA    = "Success create data"
 	SUCCESS_ADD_MEMBERS    = "Success add members"
 	SUCCESS_REMOVE_MEMBERS = "Success remove members"
 )
