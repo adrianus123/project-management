@@ -13,11 +13,11 @@ func GenerateToken(userID int64, role, email string, publicID uuid.UUID) (string
 	duration, _ := time.ParseDuration(config.AppConfig.JWTExpired)
 
 	claims := jwt.MapClaims{
-		"user_id":   userID,
-		"role":      role,
-		"public_id": publicID,
-		"email":     email,
-		"exp":       time.Now().Add(duration).Unix(),
+		"user_id": userID,
+		"role":    role,
+		"pub_id":  publicID,
+		"email":   email,
+		"exp":     time.Now().Add(duration).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

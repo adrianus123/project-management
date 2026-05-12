@@ -19,11 +19,17 @@ func main() {
 	seed.SeedAdmin()
 	app := fiber.New()
 
+	// User
 	userRepository := repository.NewUserRepository()
 	userService := service.NewUserService(userRepository)
 	userController := controller.NewUserController(userService)
 
-	routes.Setup(app, userController)
+	// Board
+	boardRepository := repository.NewBoardRepository()
+	boardService := service.NewBoardService(boardRepository, userRepository)
+	boardController := controller.NewBoardController(boardService)
+
+	routes.Setup(app, userController, boardController)
 
 	port := config.AppConfig.AppPort
 	log.Println("Server is running on port: ", port)

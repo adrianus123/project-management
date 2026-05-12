@@ -20,4 +20,5 @@ const (
 	SUCCESS_GET_DATA    = "Get data success"
 	SUCCESS_UPDATE_DATA = "Update data success"
 	SUCCESS_DELETE_DATA = "Delete data success"
+	SUCESS_CREATE       = "Success create data"
 )
