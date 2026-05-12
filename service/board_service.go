@@ -13,6 +13,8 @@ type BoardService interface {
 	Update(board *model.Board) error
 	GetByPublicID(publicID string) (*model.Board, error)
 	AddMembers(boardPublicID string, userPublicIDs []string) error
+	RemoveMembers(boardPublicID string, userPublicIDs []string) error
+	GetAllByUserPaginate(userPublicID, filter, sort string, limit, offset int) ([]model.Board, int64, error)
 }
 
 type boardServiceImpl struct {
@@ -86,4 +88,47 @@ func (s *boardServiceImpl) AddMembers(boardPublicID string, userPublicIDs []stri
 	}
 
 	return s.boardRepository.AddMember(uint(board.InternalID), newMemberIDs)
+}
+
+func (s *boardServiceImpl) RemoveMembers(boardPublicID string, userPublicIDs []string) error {
+	board, err := s.boardRepository.FindByPublicID(boardPublicID)
+	if err != nil {
+		return errors.New("board not found")
+	}
+
+	var userIDs []uint
+	for _, userPublicID := range userPublicIDs {
+		user, err := s.userRepository.FindByPublicID(userPublicID)
+		if err != nil {
+			return errors.New("user not found")
+		}
+		userIDs = append(userIDs, uint(user.InternalID))
+	}
+
+	members, err := s.boardMemberRepository.GetMembers(boardPublicID)
+	if err != nil {
+		return err
+	}
+
+	memberMap := make(map[uint]bool)
+	for _, member := range members {
+		memberMap[uint(member.InternalID)] = true
+	}
+
+	var removeMemberIDs []uint
+	for _, userID := range userIDs {
+		if _, exists := memberMap[userID]; exists {
+			removeMemberIDs = append(removeMemberIDs, userID)
+		}
+	}
+
+	if len(removeMemberIDs) == 0 {
+		return nil
+	}
+
+	return s.boardRepository.RemoveMembers(uint(board.InternalID), removeMemberIDs)
+}
+
+func (s *boardServiceImpl) GetAllByUserPaginate(userPublicID, filter, sort string, limit, offset int) ([]model.Board, int64, error) {
+	return s.boardRepository.FindAllByUserPaginate(userPublicID, filter, sort, limit, offset)
 }

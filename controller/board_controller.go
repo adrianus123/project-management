@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/adrianus123/project-management/constant"
 	"github.com/adrianus123/project-management/model"
 	"github.com/adrianus123/project-management/service"
@@ -85,4 +88,49 @@ func (c *BoardController) AddBoardMembers(ctx fiber.Ctx) error {
 	}
 
 	return util.Success(ctx, constant.SUCCESS_ADD_MEMBERS, nil)
+}
+
+func (c *BoardController) RemoveBoardMembers(ctx fiber.Ctx) error {
+	boardPublicID := ctx.Params("id")
+
+	var userPublicIDs []string
+	if err := ctx.Bind().Body(&userPublicIDs); err != nil {
+		return util.BadRequest(ctx, constant.ERR_FAILED_PARSE_DATA, nil, err.Error())
+	}
+
+	if err := c.boardService.RemoveMembers(boardPublicID, userPublicIDs); err != nil {
+		return util.BadRequest(ctx, constant.ERR_FAILED_REMOVE_MEMBERS, nil, err.Error())
+	}
+
+	return util.Success(ctx, constant.SUCCESS_REMOVE_MEMBERS, nil)
+}
+
+func (c *BoardController) GetMyBoardPaginate(ctx fiber.Ctx) error {
+	user := ctx.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+
+	userPublicID := claims["pub_id"].(string)
+
+	page, _ := strconv.Atoi(ctx.Query("page", "1"))
+	limit, _ := strconv.Atoi(ctx.Query("limit", "10"))
+	offset := (page - 1) * limit
+
+	filter := ctx.Query("filter", "")
+	sort := ctx.Query("sort", "")
+
+	boards, total, err := c.boardService.GetAllByUserPaginate(userPublicID, filter, sort, limit, offset)
+	if err != nil {
+		return util.InternalServerError(ctx, constant.ERR_INTERNAL_SERVER_ERROR, nil, err.Error())
+	}
+
+	meta := util.PaginationMeta{
+		Page:      page,
+		Limit:     limit,
+		Total:     int(total),
+		TotalPage: int(math.Ceil(float64(total) / float64(limit))),
+		Filter:    filter,
+		Sort:      sort,
+	}
+
+	return util.SuccessPagination(ctx, constant.SUCCESS_GET_DATA, boards, meta)
 }
